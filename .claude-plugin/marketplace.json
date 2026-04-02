@@ -12,7 +12,7 @@
       "name": "wkai-stats",
       "source": "./plugins/wkai-stats",
       "category": "development",
-      "description": "Query Claude Code token usage from stats-cache and submit to wk.ai ranking."
+      "description": "Query Claude Code token usage from stats-cache and submit to wk.ai ranking. Includes /wkai-stats:wkai-setup for one-step MCP server configuration."
     }
   ]
 }

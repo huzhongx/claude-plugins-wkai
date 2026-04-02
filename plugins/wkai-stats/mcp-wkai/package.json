@@ -1,0 +1,14 @@
+{
+  "name": "wkai-mcp-server",
+  "version": "1.0.0",
+  "description": "wk.ai MCP Server - AI Agent Platform Integration",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.6.0"
+  }
+}
