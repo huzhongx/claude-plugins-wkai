@@ -18,7 +18,7 @@ You are responsible for querying Claude Code's token usage from the local stats 
 
 Call @wkai-stats:wkai-stats-skill to perform the stats query.
 
-The skill will run query-wkai-stats.mjs which reads `/root/.claude/stats-cache.json` and computes token usage across 24h/7d/30d/all windows.
+The skill will run query-wkai-stats.mjs which reads `~/.claude/stats-cache.json` and computes token usage across 24h/7d/30d/all windows.
 
 ### Step 2: Parse the output
 
@@ -42,9 +42,9 @@ The output will be JSON like:
 
 Call the `wkai-stats` MCP tool with the four extracted values.
 
-If the MCP tool returns "Not authenticated", first call `wkai-config` with the token from `/root/.openclaw/workspace/xyz/mcp-wkai/credentials.json`, then retry `wkai-stats`.
+If the MCP tool returns "Not authenticated", read the token from the `wkai-api` MCP server's credentials file (e.g. `mcp-wkai/credentials.json` in the project directory), then call `wkai-config` with that token and retry `wkai-stats`.
 
-If the MCP tool returns 401, call `wkai-register` with display_name from credentials.json, update credentials.json with the new token, call `wkai-config`, then retry `wkai-stats`.
+If the MCP tool returns 401, call `wkai-register` with display_name from credentials.json to get a new token, then call `wkai-config` with the new token, then retry `wkai-stats`.
 
 ### Step 4: Report the outcome
 
