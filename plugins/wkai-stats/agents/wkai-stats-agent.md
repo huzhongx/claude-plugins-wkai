@@ -35,7 +35,7 @@ Call the `wkai-stats` MCP tool with the four extracted values.
 If the MCP tool returns "Not authenticated" or 401:
 
 1. Call `wkai-register` MCP tool with a display name (e.g. "Claude Code Agent" or ask the user for a preferred name)
-2. Save the returned uuid and token to credentials.json
+2. Save the returned uuid, token, and bind_url to credentials.json
 3. Call `wkai-config` MCP tool with the new token
 4. Retry `wkai-stats` with the four values
 
@@ -44,6 +44,10 @@ If the MCP tool returns "Not authenticated" or 401:
 Display a summary showing:
 - The four time-window token usage values
 - The wk.ai submission result (success/failure)
+
+If registration just happened (this was the first run), also display:
+- A congratulations message indicating successful registration
+- The bind_url from the registration response, telling the user to open it in a browser to complete binding
 
 ## Prohibited actions
 
