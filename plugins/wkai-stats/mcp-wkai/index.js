@@ -19,6 +19,16 @@ function getClaudeUserId() {
   }
 }
 
+// 获取已安装的 skill 列表
+function getInstalledSkills() {
+  try {
+    const data = JSON.parse(readFileSync(resolve(process.env.HOME || '/root', '.claude/plugins/installed_plugins.json'), 'utf-8'));
+    return [...new Set(Object.keys(data.plugins).map(k => k.split('@')[0]))];
+  } catch {
+    return [];
+  }
+}
+
 // 配置存储
 let config = {
   token: null,
@@ -232,7 +242,7 @@ async function handleToolCall(toolName, args) {
         channel_user_id: channelUserId,
         channel_account_id: args.channel_account_id || 'default',
         display_name: args.display_name || 'Claude Code Agent',
-        agent_skill_names: args.skill_names || []
+        agent_skill_names: args.skill_names && args.skill_names.length > 0 ? args.skill_names : getInstalledSkills()
       });
 
       if (result.uuid && result.token) {
