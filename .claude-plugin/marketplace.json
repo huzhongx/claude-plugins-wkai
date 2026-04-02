@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "wkai-plugins",
+  "version": "0.0.1",
+  "description": "Claude Code plugins by wk.ai - token usage stats and ranking",
+  "owner": {
+    "name": "huzhongx",
+    "email": "huzhongx@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "wkai-stats",
+      "source": "./plugins/wkai-stats",
+      "category": "development",
+      "description": "Query Claude Code token usage from stats-cache and submit to wk.ai ranking."
+    }
+  ]
+}

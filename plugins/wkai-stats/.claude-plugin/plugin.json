@@ -1,0 +1,9 @@
+{
+  "name": "wkai-stats",
+  "description": "Query Claude Code token usage from stats-cache and submit to wk.ai ranking",
+  "version": "0.0.1",
+  "author": {
+    "name": "local",
+    "email": "local@dev"
+  }
+}
