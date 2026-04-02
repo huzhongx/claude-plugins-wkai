@@ -1,76 +1,96 @@
 #!/usr/bin/env node
 
 /**
- * Query Claude Code token usage from stats-cache.json
- * Computes token_usage_24h, token_usage_7d, token_usage_30d, token_usage_all
+ * Query Claude Code token usage by scanning session JSONL files.
+ * Reads all projects under ~/.claude/projects/ and sums token usage
+ * across 24h/7d/30d/all time windows.
  */
 
-import { readFileSync } from 'fs';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync, readdirSync, statSync } from 'fs';
+import { resolve, join } from 'path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-// stats-cache.json location
-const STATS_CACHE_PATH = resolve(process.env.HOME || '/root', '.claude', 'stats-cache.json');
+const CLAUDE_DIR = resolve(process.env.HOME || '/root', '.claude');
+const PROJECTS_DIR = join(CLAUDE_DIR, 'projects');
 
 function main() {
-  let data;
-  try {
-    const raw = readFileSync(STATS_CACHE_PATH, 'utf-8');
-    data = JSON.parse(raw);
-  } catch (e) {
-    console.error(JSON.stringify({ error: `Failed to read ${STATS_CACHE_PATH}: ${e.message}` }));
-    process.exit(1);
-  }
-
-  const dailyModelTokens = data.dailyModelTokens || [];
-  const modelUsage = data.modelUsage || {};
-
-  // Compute current time windows
   const now = new Date();
-  const ms24h = 24 * 60 * 60 * 1000;
-  const ms7d = 7 * 24 * 60 * 60 * 1000;
-  const ms30d = 30 * 24 * 60 * 60 * 1000;
-
-  const cutoff24h = new Date(now.getTime() - ms24h);
-  const cutoff7d = new Date(now.getTime() - ms7d);
-  const cutoff30d = new Date(now.getTime() - ms30d);
+  const cutoff24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const cutoff7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const cutoff30d = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
   let token24h = 0;
   let token7d = 0;
   let token30d = 0;
   let tokenAll = 0;
 
-  // Aggregate from dailyModelTokens
-  for (const day of dailyModelTokens) {
-    const dayDate = new Date(day.date + 'T00:00:00');
-    let dayTotal = 0;
-    for (const tokens of Object.values(day.tokensByModel)) {
-      dayTotal += tokens;
-    }
-
-    tokenAll += dayTotal;
-
-    if (dayDate >= cutoff24h) {
-      token24h += dayTotal;
-    }
-    if (dayDate >= cutoff7d) {
-      token7d += dayTotal;
-    }
-    if (dayDate >= cutoff30d) {
-      token30d += dayTotal;
-    }
+  // Discover all project directories
+  let projectDirs;
+  try {
+    projectDirs = readdirSync(PROJECTS_DIR).filter(f => {
+      return statSync(join(PROJECTS_DIR, f)).isDirectory();
+    });
+  } catch (e) {
+    console.error(JSON.stringify({ error: `Failed to read projects dir: ${e.message}` }));
+    process.exit(1);
   }
 
-  // If dailyModelTokens doesn't cover today (lastComputedDate might be yesterday),
-  // add modelUsage cumulative totals as a fallback for "all"
-  if (tokenAll === 0 && Object.keys(modelUsage).length > 0) {
-    for (const model of Object.values(modelUsage)) {
-      tokenAll += (model.inputTokens || 0)
-                + (model.outputTokens || 0)
-                + (model.cacheReadInputTokens || 0)
-                + (model.cacheCreationInputTokens || 0);
+  // Scan each project's JSONL files
+  for (const projDir of projectDirs) {
+    const projPath = join(PROJECTS_DIR, projDir);
+    let files;
+    try {
+      files = readdirSync(projPath).filter(f => f.endsWith('.jsonl'));
+    } catch {
+      continue;
+    }
+
+    for (const file of files) {
+      const filePath = join(projPath, file);
+
+      // Use file mtime as a quick filter: if modified before 30d ago, skip
+      try {
+        const mtime = new Date(statSync(filePath).mtime);
+        if (mtime < cutoff30d) continue;
+      } catch {
+        continue;
+      }
+
+      // Read file and parse line by line
+      let content;
+      try {
+        content = readFileSync(filePath, 'utf-8');
+      } catch {
+        continue;
+      }
+
+      const lines = content.split('\n');
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        let obj;
+        try { obj = JSON.parse(line); } catch { continue; }
+
+        // Extract timestamp
+        const ts = obj.timestamp || obj.ts;
+        if (!ts) continue;
+        const msgDate = new Date(ts);
+        if (isNaN(msgDate.getTime())) continue;
+
+        // Extract usage from message
+        const msg = obj.message || {};
+        const usage = msg.usage || {};
+        const inputTokens = usage.input_tokens || 0;
+        const outputTokens = usage.output_tokens || 0;
+        const cacheRead = usage.cache_read_input_tokens || 0;
+        const cacheCreation = usage.cache_creation_input_tokens || 0;
+        const total = inputTokens + outputTokens + cacheRead + cacheCreation;
+
+        if (total === 0) continue;
+
+        tokenAll += total;
+        if (msgDate >= cutoff30d) token30d += total;
+        if (msgDate >= cutoff7d) token7d += total;
+        if (msgDate >= cutoff24h) token24h += total;
+      }
     }
   }
 
