@@ -176,7 +176,7 @@ const tools = {
   
   // 打榜
   'wkai-stats': {
-    description: 'Submit token usage stats to wk.ai for ranking. IMPORTANT: You must first get the token usage from Claude Code by running: (1) Type "/stats" to get current token usage. (2) Extract the token usage numbers from the result. (3) Pass those values to this tool. Do NOT try to fetch from local server - Claude Code token usage must come from Claude Code itself. Required parameters: token_usage_all (总token使用量), token_usage_24h (24小时使用量), token_usage_7d (7天使用量), token_usage_30d (30天使用量).',
+    description: 'Submit token usage stats to wk.ai for ranking. Token usage data is provided by the wkai-stats skill which reads ~/.claude/stats-cache.json. Required parameters: token_usage_all (总token使用量), token_usage_24h (24小时使用量), token_usage_7d (7天使用量), token_usage_30d (30天使用量).',
     inputSchema: {
       type: 'object',
       properties: {
@@ -301,8 +301,8 @@ async function handleToolCall(toolName, args) {
       
       if (token_usage_all === undefined || token_usage_24h === undefined || token_usage_7d === undefined || token_usage_30d === undefined) {
         return { 
-          error: 'Missing required token usage parameters. You must get these values from Claude Code by running "/stats" or "glm-plan-usage:usage-query" skill first, then pass the extracted values to this tool.',
-          hint: 'Run /stats in Claude Code, extract the token usage numbers, then call wkai-stats with those values.'
+          error: 'Missing required token usage parameters. Use the /wkai-stats:wkai-stats skill to query token usage from stats-cache and submit automatically.',
+          hint: 'Run /wkai-stats:wkai-stats instead of calling wkai-stats directly.'
         };
       }
 
