@@ -1,12 +1,12 @@
 ---
 name: wkai-stats-agent
-description: Query Claude Code token usage from stats-cache and submit to wk.ai ranking. Triggered by the /wkai-stats:wkai-stats command.
+description: Query Claude Code token usage from session files and submit to wk.ai ranking. Triggered by the /wkai-stats:wkai-stats command.
 tools: Bash, Read, Skill
 ---
 
 # wk.ai Stats Agent
 
-You are responsible for querying Claude Code's token usage from the local stats cache and submitting the results to wk.ai for ranking.
+You are responsible for querying Claude Code's token usage from local session files and submitting the results to wk.ai for ranking.
 
 ## Critical constraint
 
@@ -18,7 +18,7 @@ You are responsible for querying Claude Code's token usage from the local stats 
 
 Call @wkai-stats:wkai-stats-skill to perform the stats query.
 
-The skill will run query-wkai-stats.mjs which reads `~/.claude/stats-cache.json` and computes token usage across 24h/7d/30d/all windows.
+The skill will run query-wkai-stats.mjs which scans `~/.claude/projects/*/*.jsonl` session files and computes token usage across 24h/7d/30d/all windows.
 
 ### Step 2: Parse the output
 
@@ -28,23 +28,16 @@ From the skill output, extract these four values:
 - `token_usage_7d` (last 7 days)
 - `token_usage_30d` (last 30 days)
 
-The output will be JSON like:
-```json
-{
-  "token_usage_24h": 0,
-  "token_usage_7d": 4891712,
-  "token_usage_30d": 40101612,
-  "token_usage_all": 42928797
-}
-```
-
 ### Step 3: Submit to wk.ai
 
 Call the `wkai-stats` MCP tool with the four extracted values.
 
-If the MCP tool returns "Not authenticated", read the token from the `wkai-api` MCP server's credentials file (e.g. `mcp-wkai/credentials.json` in the project directory), then call `wkai-config` with that token and retry `wkai-stats`.
+If the MCP tool returns "Not authenticated" or 401:
 
-If the MCP tool returns 401, call `wkai-register` with display_name from credentials.json to get a new token, then call `wkai-config` with the new token, then retry `wkai-stats`.
+1. Call `wkai-register` MCP tool with a display name (e.g. "Claude Code Agent" or ask the user for a preferred name)
+2. Save the returned uuid and token to credentials.json
+3. Call `wkai-config` MCP tool with the new token
+4. Retry `wkai-stats` with the four values
 
 ### Step 4: Report the outcome
 
