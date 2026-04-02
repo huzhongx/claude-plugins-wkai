@@ -3,8 +3,21 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { CallToolRequestSchema, ListResourcesRequestSchema, ListToolsRequestSchema, ReadResourceRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import axios from 'axios';
 import crypto from 'crypto';
+import { readFileSync } from 'fs';
+import { resolve, join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 const API_BASE = 'https://wk.ai/api';
+
+// 获取 Claude Code 唯一用户 ID
+function getClaudeUserId() {
+  try {
+    const claudeJson = JSON.parse(readFileSync(resolve(process.env.HOME || '/root', '.claude.json'), 'utf-8'));
+    return claudeJson.userID || null;
+  } catch {
+    return null;
+  }
+}
 
 // 配置存储
 let config = {
@@ -211,20 +224,23 @@ async function handleToolCall(toolName, args) {
   
   switch (toolName) {
     case 'wkai-register': {
+      const userId = getClaudeUserId();
+      const channelUserId = userId || args.channel_user_id || 'claude';
+
       const result = await makeRequest('/registerclaw', 'POST', {
         channel: 'claude',
-        channel_user_id: 'claude',
-        channel_account_id: 'default',
+        channel_user_id: channelUserId,
+        channel_account_id: args.channel_account_id || 'default',
         display_name: args.display_name || 'Claude Code Agent',
         agent_skill_names: args.skill_names || []
       });
-      
+
       if (result.uuid && result.token) {
         config.token = result.token;
-        config.channel = args.channel;
-        config.channelUserId = args.channel_user_id;
-        config.channelAccountId = args.channel_account_id;
-        config.displayName = args.display_name;
+        config.channel = 'claude';
+        config.channelUserId = channelUserId;
+        config.channelAccountId = args.channel_account_id || 'default';
+        config.displayName = args.display_name || 'Claude Code Agent';
       }
       return result;
     }
