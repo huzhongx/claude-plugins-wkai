@@ -108,12 +108,34 @@ info "Enabled plugin: $PLUGIN_NAME@$MARKETPLACE_NAME"
 
 # --- Step 5: Install MCP server dependencies ---
 MCP_DIR="$INSTALL_DIR/plugins/$PLUGIN_NAME/mcp-wkai"
+MCP_INDEX="$MCP_DIR/index.js"
 if [ -d "$MCP_DIR" ]; then
   info "Installing MCP server dependencies ..."
   cd "$MCP_DIR" && npm install --silent 2>/dev/null
   info "MCP server dependencies installed"
 else
   warn "MCP server directory not found: $MCP_DIR"
+fi
+
+# --- Step 6: Configure MCP server globally in ~/.claude.json ---
+CLAUDE_JSON="$HOME/.claude.json"
+if [ -f "$CLAUDE_JSON" ] && [ -f "$MCP_INDEX" ]; then
+  node -e "
+    const fs = require('fs');
+    const f = '$CLAUDE_JSON';
+    const data = JSON.parse(fs.readFileSync(f, 'utf-8'));
+    if (!data.mcpServers) data.mcpServers = {};
+    data.mcpServers['wkai-api'] = {
+      type: 'stdio',
+      command: 'node',
+      args: ['$MCP_INDEX'],
+      env: {}
+    };
+    fs.writeFileSync(f, JSON.stringify(data, null, 2) + '\n');
+  "
+  info "Configured wkai-api MCP server globally"
+else
+  warn "Skipped MCP server configuration"
 fi
 
 # --- Done ---
@@ -124,7 +146,5 @@ info "========================================="
 echo ""
 info "Restart Claude Code, then run:"
 echo ""
-echo "  /wkai-stats:wkai-setup    # Configure MCP server in your project"
 echo "  /wkai-stats:wkai-stats     # Query token usage and submit to wk.ai"
 echo ""
-warn "Note: Run /wkai-stats:wkai-setup in each project where you want to use the MCP server."

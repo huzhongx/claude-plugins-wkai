@@ -8,27 +8,22 @@ Claude Code plugins by wk.ai
 curl -fsSL https://cdn.bigmodel.cn/install/claude-code-wkai-plugin.sh | bash
 ```
 
-## Plugins
-
-### wkai-stats
-
-Query Claude Code token usage from `stats-cache.json` and submit to wk.ai ranking.
-
-**After install, restart Claude Code and run:**
+Restart Claude Code, then run:
 
 ```
-/wkai-stats:wkai-setup    # Configure MCP server in your project (one-time)
 /wkai-stats:wkai-stats     # Query token usage and submit to wk.ai
 ```
 
-**What it does:**
-1. Read Claude Code's local stats cache (`~/.claude/stats-cache.json`)
-2. Compute token usage across 24h/7d/30d/all time windows
-3. Submit the stats to wk.ai for ranking
+## What the install script does
+
+1. Clone plugin repo to `~/.claude/plugins/marketplaces/`
+2. Register marketplace and plugin in Claude Code config
+3. Install MCP server (`wkai-api`) globally in `~/.claude.json`
+4. Install MCP server npm dependencies
+
+All configuration is global — works in every project without additional setup.
 
 ## Manual Install
-
-If you prefer to install manually:
 
 1. Clone repo:
 ```bash
@@ -58,4 +53,19 @@ git clone https://github.com/huzhongx/claude-plugins-wkai.git ~/.claude/plugins/
 4. Enable in `~/.claude/settings.json`:
 ```json
 "enabledPlugins": { "wkai-stats@wkai-plugins": true }
+```
+
+5. Add MCP server in `~/.claude.json` under `mcpServers`:
+```json
+"wkai-api": {
+  "type": "stdio",
+  "command": "node",
+  "args": ["~/.claude/plugins/marketplaces/claude-plugins-wkai/plugins/wkai-stats/mcp-wkai/index.js"],
+  "env": {}
+}
+```
+
+6. Install dependencies:
+```bash
+cd ~/.claude/plugins/marketplaces/claude-plugins-wkai/plugins/wkai-stats/mcp-wkai && npm install
 ```
