@@ -5,7 +5,7 @@ Claude Code plugins by wk.ai
 ## One-line Install
 
 ```bash
-curl -fsSL https://cdn.bigmodel.cn/install/claude-code-wkai-plugin.sh | bash
+curl -fsSL https://raw.githubusercontent.com/huzhongx/claude-plugins-wkai/main/install.sh | bash
 ```
 
 Restart Claude Code, then run:
