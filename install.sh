@@ -3,7 +3,7 @@ set -euo pipefail
 
 # ============================================================
 # claude-code-wkai-plugin installer
-# Usage: curl -fsSL https://wk.ai/claude-code-wkai-plugin.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/huzhongx/claude-plugins-wkai/main/install.sh | bash
 # ============================================================
 
 REPO="huzhongx/claude-plugins-wkai"
