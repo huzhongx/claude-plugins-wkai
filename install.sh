@@ -2,17 +2,17 @@
 set -euo pipefail
 
 # ============================================================
-# claude-code-wkai-plugin installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/huzhongx/claude-plugins-wkai/main/install.sh | bash
+# claude-code-willai-plugin installer
+# Usage: curl -fsSL https://raw.githubusercontent.com/huzhongx/claude-plugins-willai/main/install.sh | bash
 # ============================================================
 
-REPO="huzhongx/claude-plugins-wkai"
-MARKETPLACE_NAME="wkai-plugins"
-PLUGIN_NAME="wkai-stats"
+REPO="huzhongx/claude-plugins-willai"
+MARKETPLACE_NAME="willai-plugins"
+PLUGIN_NAME="willai-stats"
 PLUGIN_VERSION="0.0.1"
 CLAUDE_DIR="$HOME/.claude"
 PLUGINS_DIR="$CLAUDE_DIR/plugins"
-INSTALL_DIR="$PLUGINS_DIR/marketplaces/claude-plugins-wkai"
+INSTALL_DIR="$PLUGINS_DIR/marketplaces/claude-plugins-willai"
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
 
 RED='\033[0;31m'
@@ -107,7 +107,7 @@ fi
 info "Enabled plugin: $PLUGIN_NAME@$MARKETPLACE_NAME"
 
 # --- Step 5: Install MCP server dependencies ---
-MCP_DIR="$INSTALL_DIR/plugins/$PLUGIN_NAME/mcp-wkai"
+MCP_DIR="$INSTALL_DIR/plugins/$PLUGIN_NAME/mcp-willai"
 MCP_INDEX="$MCP_DIR/index.js"
 if [ -d "$MCP_DIR" ]; then
   info "Installing MCP server dependencies ..."
@@ -125,7 +125,7 @@ if [ -f "$CLAUDE_JSON" ] && [ -f "$MCP_INDEX" ]; then
     const f = '$CLAUDE_JSON';
     const data = JSON.parse(fs.readFileSync(f, 'utf-8'));
     if (!data.mcpServers) data.mcpServers = {};
-    data.mcpServers['wkai-api'] = {
+    data.mcpServers['willai-api'] = {
       type: 'stdio',
       command: 'node',
       args: ['$MCP_INDEX'],
@@ -133,7 +133,7 @@ if [ -f "$CLAUDE_JSON" ] && [ -f "$MCP_INDEX" ]; then
     };
     fs.writeFileSync(f, JSON.stringify(data, null, 2) + '\n');
   "
-  info "Configured wkai-api MCP server globally"
+  info "Configured willai-api MCP server globally"
 else
   warn "Skipped MCP server configuration"
 fi
@@ -146,5 +146,5 @@ info "========================================="
 echo ""
 info "Restart Claude Code, then run:"
 echo ""
-echo "  /wkai-stats:wkai-stats     # Query token usage and submit to wk.ai"
+echo "  /willai-stats:willai-stats     # Query token usage and submit to will.ai"
 echo ""

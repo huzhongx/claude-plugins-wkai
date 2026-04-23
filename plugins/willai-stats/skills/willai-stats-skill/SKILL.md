@@ -1,10 +1,10 @@
 ---
-name: wkai-stats-skill
-description: Run the stats query script to retrieve Claude Code token usage from stats-cache.json for wk.ai ranking. Only use when invoked by wkai-stats-agent.
+name: willai-stats-skill
+description: Run the stats query script to retrieve Claude Code token usage from stats-cache.json for will.ai ranking. Only use when invoked by willai-stats-agent.
 allowed-tools: Bash, Read
 ---
 
-# wk.ai Stats Query Skill
+# will.ai Stats Query Skill
 
 Execute the stats query script and return the result.
 
@@ -17,7 +17,7 @@ Execute the stats query script and return the result.
 ### Run the query
 
 ```bash
-node skills/wkai-stats-skill/scripts/query-wkai-stats.mjs
+node skills/willai-stats-skill/scripts/query-willai-stats.mjs
 ```
 
 ### Return the result

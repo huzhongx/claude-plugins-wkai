@@ -1,24 +1,24 @@
-# claude-plugins-wkai
+# claude-plugins-willai
 
-Claude Code plugins by wk.ai
+Claude Code plugins by will.ai
 
 ## One-line Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/huzhongx/claude-plugins-wkai/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/huzhongx/claude-plugins-willai/main/install.sh | bash
 ```
 
 Restart Claude Code, then run:
 
 ```
-/wkai-stats:wkai-stats     # Query token usage and submit to wk.ai
+/willai-stats:willai-stats     # Query token usage and submit to will.ai
 ```
 
 ## What the install script does
 
 1. Clone plugin repo to `~/.claude/plugins/marketplaces/`
 2. Register marketplace and plugin in Claude Code config
-3. Install MCP server (`wkai-api`) globally in `~/.claude.json`
+3. Install MCP server (`willai-api`) globally in `~/.claude.json`
 4. Install MCP server npm dependencies
 
 All configuration is global — works in every project without additional setup.
@@ -27,23 +27,23 @@ All configuration is global — works in every project without additional setup.
 
 1. Clone repo:
 ```bash
-git clone https://github.com/huzhongx/claude-plugins-wkai.git ~/.claude/plugins/marketplaces/claude-plugins-wkai
+git clone https://github.com/huzhongx/claude-plugins-willai.git ~/.claude/plugins/marketplaces/claude-plugins-willai
 ```
 
 2. Register marketplace in `~/.claude/plugins/known_marketplaces.json`:
 ```json
-"wkai-plugins": {
-  "source": { "source": "github", "repo": "huzhongx/claude-plugins-wkai" },
-  "installLocation": "~/.claude/plugins/marketplaces/claude-plugins-wkai",
+"willai-plugins": {
+  "source": { "source": "github", "repo": "huzhongx/claude-plugins-willai" },
+  "installLocation": "~/.claude/plugins/marketplaces/claude-plugins-willai",
   "lastUpdated": "2026-04-02T03:00:00.000Z"
 }
 ```
 
 3. Register plugin in `~/.claude/plugins/installed_plugins.json` under `plugins`:
 ```json
-"wkai-stats@wkai-plugins": [{
+"willai-stats@willai-plugins": [{
   "scope": "user",
-  "installPath": "~/.claude/plugins/marketplaces/claude-plugins-wkai/plugins/wkai-stats",
+  "installPath": "~/.claude/plugins/marketplaces/claude-plugins-willai/plugins/willai-stats",
   "version": "0.0.1",
   "installedAt": "...",
   "lastUpdated": "..."
@@ -52,20 +52,20 @@ git clone https://github.com/huzhongx/claude-plugins-wkai.git ~/.claude/plugins/
 
 4. Enable in `~/.claude/settings.json`:
 ```json
-"enabledPlugins": { "wkai-stats@wkai-plugins": true }
+"enabledPlugins": { "willai-stats@willai-plugins": true }
 ```
 
 5. Add MCP server in `~/.claude.json` under `mcpServers`:
 ```json
-"wkai-api": {
+"willai-api": {
   "type": "stdio",
   "command": "node",
-  "args": ["~/.claude/plugins/marketplaces/claude-plugins-wkai/plugins/wkai-stats/mcp-wkai/index.js"],
+  "args": ["~/.claude/plugins/marketplaces/claude-plugins-willai/plugins/willai-stats/mcp-willai/index.js"],
   "env": {}
 }
 ```
 
 6. Install dependencies:
 ```bash
-cd ~/.claude/plugins/marketplaces/claude-plugins-wkai/plugins/wkai-stats/mcp-wkai && npm install
+cd ~/.claude/plugins/marketplaces/claude-plugins-willai/plugins/willai-stats/mcp-willai && npm install
 ```

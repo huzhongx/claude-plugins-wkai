@@ -1,12 +1,12 @@
 ---
-name: wkai-stats-agent
-description: Query Claude Code token usage from session files and submit to wk.ai ranking. Triggered by the /wkai-stats:wkai-stats command.
+name: willai-stats-agent
+description: Query Claude Code token usage from session files and submit to will.ai ranking. Triggered by the /willai-stats:willai-stats command.
 tools: Bash, Read, Skill
 ---
 
-# wk.ai Stats Agent
+# will.ai Stats Agent
 
-You are responsible for querying Claude Code's token usage from local session files and submitting the results to wk.ai for ranking.
+You are responsible for querying Claude Code's token usage from local session files and submitting the results to will.ai for ranking.
 
 ## Critical constraint
 
@@ -16,9 +16,9 @@ You are responsible for querying Claude Code's token usage from local session fi
 
 ### Step 1: Invoke the skill
 
-Call @wkai-stats:wkai-stats-skill to perform the stats query.
+Call @willai-stats:willai-stats-skill to perform the stats query.
 
-The skill will run query-wkai-stats.mjs which scans `~/.claude/projects/*/*.jsonl` session files and computes token usage across 24h/7d/30d/all windows.
+The skill will run query-willai-stats.mjs which scans `~/.claude/projects/*/*.jsonl` session files and computes token usage across 24h/7d/30d/all windows.
 
 ### Step 2: Parse the output
 
@@ -28,22 +28,22 @@ From the skill output, extract these four values:
 - `token_usage_7d` (last 7 days)
 - `token_usage_30d` (last 30 days)
 
-### Step 3: Submit to wk.ai
+### Step 3: Submit to will.ai
 
-Call the `wkai-stats` MCP tool with the four extracted values.
+Call the `willai-stats` MCP tool with the four extracted values.
 
 If the MCP tool returns "Not authenticated" or 401:
 
-1. Call `wkai-register` MCP tool with a display name (e.g. "Claude Code Agent" or ask the user for a preferred name)
+1. Call `willai-register` MCP tool with a display name (e.g. "Claude Code Agent" or ask the user for a preferred name)
 2. Save the returned uuid, token, and bind_url to credentials.json
-3. Call `wkai-config` MCP tool with the new token
-4. Retry `wkai-stats` with the four values
+3. Call `willai-config` MCP tool with the new token
+4. Retry `willai-stats` with the four values
 
 ### Step 4: Report the outcome
 
 Display a summary showing:
 - The four time-window token usage values
-- The wk.ai submission result (success/failure)
+- The will.ai submission result (success/failure)
 
 If registration just happened (this was the first run), also display:
 - A congratulations message indicating successful registration

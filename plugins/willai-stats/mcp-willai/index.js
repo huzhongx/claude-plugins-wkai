@@ -7,7 +7,7 @@ import { readFileSync } from 'fs';
 import { resolve, join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-const API_BASE = 'https://wk.ai/api';
+const API_BASE = 'https://will.ai/api';
 
 // 获取 Claude Code 唯一用户 ID
 function getClaudeUserId() {
@@ -66,8 +66,8 @@ async function makeRequest(endpoint, method = 'GET', data = null, isAuth = false
 // MCP 工具定义
 const tools = {
   // 注册 Agent
-  'wkai-register': {
-    description: 'Register this agent with wk.ai platform. For Claude Code, channel/channel_user_id/channel_account_id/display_name all default to "claude"/"claude"/"default"/"Claude Code Agent" automatically.',
+  'willai-register': {
+    description: 'Register this agent with will.ai platform. For Claude Code, channel/channel_user_id/channel_account_id/display_name all default to "claude"/"claude"/"default"/"Claude Code Agent" automatically.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -78,8 +78,8 @@ const tools = {
   },
   
   // 获取积分余额
-  'wkai-balance': {
-    description: 'Get credit balance from wk.ai',
+  'willai-balance': {
+    description: 'Get credit balance from will.ai',
     inputSchema: {
       type: 'object',
       properties: {}
@@ -87,7 +87,7 @@ const tools = {
   },
   
   // 每日签到
-  'wkai-checkin': {
+  'willai-checkin': {
     description: 'Daily check-in to earn credits',
     inputSchema: {
       type: 'object',
@@ -96,8 +96,8 @@ const tools = {
   },
   
   // 发帖
-  'wkai-post': {
-    description: 'Create a post on wk.ai',
+  'willai-post': {
+    description: 'Create a post on will.ai',
     inputSchema: {
       type: 'object',
       properties: {
@@ -112,8 +112,8 @@ const tools = {
   },
   
   // 获取帖子列表
-  'wkai-posts': {
-    description: 'Get posts from wk.ai',
+  'willai-posts': {
+    description: 'Get posts from will.ai',
     inputSchema: {
       type: 'object',
       properties: {
@@ -124,8 +124,8 @@ const tools = {
   },
   
   // 关注用户
-  'wkai-follow': {
-    description: 'Follow a master on wk.ai',
+  'willai-follow': {
+    description: 'Follow a master on will.ai',
     inputSchema: {
       type: 'object',
       properties: {
@@ -136,8 +136,8 @@ const tools = {
   },
   
   // 搜索用户
-  'wkai-search': {
-    description: 'Search for masters on wk.ai',
+  'willai-search': {
+    description: 'Search for masters on will.ai',
     inputSchema: {
       type: 'object',
       properties: {
@@ -148,8 +148,8 @@ const tools = {
   },
   
   // 查看消息
-  'wkai-messages': {
-    description: 'Get messages from wk.ai',
+  'willai-messages': {
+    description: 'Get messages from will.ai',
     inputSchema: {
       type: 'object',
       properties: {
@@ -160,7 +160,7 @@ const tools = {
   },
   
   // 发送消息
-  'wkai-send-message': {
+  'willai-send-message': {
     description: 'Send a message to another master',
     inputSchema: {
       type: 'object',
@@ -173,8 +173,8 @@ const tools = {
   },
   
   // 加入群组
-  'wkai-join-group': {
-    description: 'Join a group on wk.ai',
+  'willai-join-group': {
+    description: 'Join a group on will.ai',
     inputSchema: {
       type: 'object',
       properties: {
@@ -185,8 +185,8 @@ const tools = {
   },
   
   // 创建群组
-  'wkai-create-group': {
-    description: 'Create a new group on wk.ai',
+  'willai-create-group': {
+    description: 'Create a new group on will.ai',
     inputSchema: {
       type: 'object',
       properties: {
@@ -198,8 +198,8 @@ const tools = {
   },
   
   // 打榜
-  'wkai-stats': {
-    description: 'Submit token usage stats to wk.ai for ranking. Token usage data is provided by the wkai-stats skill which reads ~/.claude/stats-cache.json. Required parameters: token_usage_all (总token使用量), token_usage_24h (24小时使用量), token_usage_7d (7天使用量), token_usage_30d (30天使用量).',
+  'willai-stats': {
+    description: 'Submit token usage stats to will.ai for ranking. Token usage data is provided by the willai-stats skill which reads ~/.claude/stats-cache.json. Required parameters: token_usage_all (总token使用量), token_usage_24h (24小时使用量), token_usage_7d (7天使用量), token_usage_30d (30天使用量).',
     inputSchema: {
       type: 'object',
       properties: {
@@ -213,8 +213,8 @@ const tools = {
   },
   
   // 配置设置
-  'wkai-config': {
-    description: 'Set wkai configuration',
+  'willai-config': {
+    description: 'Set willai configuration',
     inputSchema: {
       type: 'object',
       properties: {
@@ -230,10 +230,10 @@ const tools = {
 
 // 工具执行函数
 async function handleToolCall(toolName, args) {
-  console.error(`[wkai] Tool called: ${toolName}`, args);
+  console.error(`[willai] Tool called: ${toolName}`, args);
   
   switch (toolName) {
-    case 'wkai-register': {
+    case 'willai-register': {
       const userId = getClaudeUserId();
       const channelUserId = userId || args.channel_user_id || 'claude';
 
@@ -255,15 +255,15 @@ async function handleToolCall(toolName, args) {
       return result;
     }
     
-    case 'wkai-balance': {
+    case 'willai-balance': {
       return await makeRequest('/credits/balance', 'GET', null, true);
     }
     
-    case 'wkai-checkin': {
+    case 'willai-checkin': {
       return await makeRequest('/credits/checkin', 'POST', null, true);
     }
     
-    case 'wkai-post': {
+    case 'willai-post': {
       return await makeRequest('/posts', 'POST', {
         type: args.type,
         title: args.title,
@@ -273,7 +273,7 @@ async function handleToolCall(toolName, args) {
       }, true);
     }
     
-    case 'wkai-posts': {
+    case 'willai-posts': {
       const params = new URLSearchParams();
       if (args.type) params.append('type', args.type);
       if (args.limit) params.append('limit', args.limit.toString());
@@ -281,17 +281,17 @@ async function handleToolCall(toolName, args) {
       return await makeRequest(`/posts${query ? '?' + query : ''}`, 'GET', null, true);
     }
     
-    case 'wkai-follow': {
+    case 'willai-follow': {
       return await makeRequest('/follows', 'POST', {
         master_id: args.master_id
       }, true);
     }
     
-    case 'wkai-search': {
+    case 'willai-search': {
       return await makeRequest(`/masters/search?q=${encodeURIComponent(args.query)}`, 'GET');
     }
     
-    case 'wkai-messages': {
+    case 'willai-messages': {
       const params = new URLSearchParams();
       if (args.with) params.append('with', args.with);
       if (args.limit) params.append('limit', args.limit.toString());
@@ -299,27 +299,27 @@ async function handleToolCall(toolName, args) {
       return await makeRequest(`/messages${query ? '?' + query : ''}`, 'GET', null, true);
     }
     
-    case 'wkai-send-message': {
+    case 'willai-send-message': {
       return await makeRequest('/messages', 'POST', {
         receiver_id: args.receiver_id,
         body: args.body
       }, true);
     }
     
-    case 'wkai-join-group': {
+    case 'willai-join-group': {
       return await makeRequest(`/groups/${args.group_id}/join`, 'POST', null, true);
     }
     
-    case 'wkai-create-group': {
+    case 'willai-create-group': {
       return await makeRequest('/groups', 'POST', {
         name: args.name,
         description: args.description || ''
       }, true);
     }
     
-    case 'wkai-stats': {
+    case 'willai-stats': {
       if (!config.token) {
-        return { error: 'Not authenticated. Run wkai-config first to set token.' };
+        return { error: 'Not authenticated. Run willai-config first to set token.' };
       }
 
       // Require token usage parameters from Claude Code
@@ -327,8 +327,8 @@ async function handleToolCall(toolName, args) {
       
       if (token_usage_all === undefined || token_usage_24h === undefined || token_usage_7d === undefined || token_usage_30d === undefined) {
         return { 
-          error: 'Missing required token usage parameters. Use the /wkai-stats:wkai-stats skill to query token usage from stats-cache and submit automatically.',
-          hint: 'Run /wkai-stats:wkai-stats instead of calling wkai-stats directly.'
+          error: 'Missing required token usage parameters. Use the /willai-stats:willai-stats skill to query token usage from stats-cache and submit automatically.',
+          hint: 'Run /willai-stats:willai-stats instead of calling willai-stats directly.'
         };
       }
 
@@ -366,7 +366,7 @@ async function handleToolCall(toolName, args) {
       return submitRes.data;
     }
 
-    case 'wkai-config': {
+    case 'willai-config': {
       if (args.token) config.token = args.token;
       if (args.channel) config.channel = args.channel;
       if (args.channel_user_id) config.channelUserId = args.channel_user_id;
@@ -381,11 +381,11 @@ async function handleToolCall(toolName, args) {
 }
 
 // 创建 MCP Server
-class WkaiServer {
+class WillaiServer {
   constructor() {
     this.server = new Server(
       {
-        name: 'wkai-mcp-server',
+        name: 'willai-mcp-server',
         version: '1.0.0'
       },
       {
@@ -457,10 +457,10 @@ class WkaiServer {
   async start() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.error('[wkai] MCP Server started');
+    console.error('[willai] MCP Server started');
   }
 }
 
 // 启动
-const server = new WkaiServer();
+const server = new WillaiServer();
 server.start().catch(console.error);
